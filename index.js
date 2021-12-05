@@ -46,37 +46,82 @@ pool.connect((err, client, release) => {
 	})
 })
 
-// app.get('/confirm', (req, res, next) => {
-// 	console.log("Confirm button pressed!");
-// 	// pool.query('Select * from test')
-// 	// 	.then(testData => {
-// 	// 		console.log(testData);
-// 	// 		res.send(testData.rows);
-// 	// 	})
-// })
+app.post('/getTransactionID', function(req, res){
+    console.log(req.body);
+    pool.query(`
+        CREATE TABLE IF NOT EXISTS polygonTable (
+            id int PRIMARY KEY,
+            wallet VARCHAR NOT NULL
+        );
+    `).then(rtn=>{
+        //console.log(rtn)
+        pool.query(`
+            SELECT COUNT(*) FROM polygonTable
+        `)
+        .then(count => {
+            id = Number(count.rows[0].count)+1;
+            str = `INSERT INTO polygonTable (id,wallet) VALUES (`+id+`,'`+req.body.account+`');`;
+            console.log(str);
+            pool.query(str)
+            .then(rtn => {
+                //console.log(rtn);
+                res.send(rtn.rows);
+            })
+        })
+
+    });
+
+})
 
 app.post('/confirm', function(req, res){
+    console.log("------------------------------------------");
     console.log(req.body);
 
     const Web3 = require('web3');
     const NODE_URL = "wss://speedy-nodes-nyc.moralis.io/4d4d3f866566390af4c30378/polygon/mumbai/ws";    
     const web3 = new Web3(NODE_URL);
 
-    const CONTRACT_ADDRESS = "0x3702f4c46785bbd947d59a2516ac1ea30f2babf2";
-    const revenueContract = new web3.eth.Contract([{ "inputs": [{ "internalType": "address", "name": "account", "type": "address" }, { "internalType": "uint256", "name": "id", "type": "uint256" }], "name": "balanceOf", "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }], "stateMutability": "view", "type": "function" }], CONTRACT_ADDRESS);
+    const CONTRACT_ABI = require('./LootBox_ABI.json');
+    const CONTRACT_ADDRESS = "0xE761ecECb8BC319B82550814fb00712E967B578c";  //address of LootBox
+    const revenueContract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
     
-    revenueContract.methods.balanceOf("111111", 1)
-    // revenueContract.methods.getRandNum4LootBox().call()
-    // .then(function(){
-    //   //revenueContract.methods.openLootBox()
-    // })
-  
-    // fs.appendFile('public/OrderCheckerLog.txt', req.body.logdata + '\r\n', function (err) {
-    //   if (err) 
-    //     return console.log(err);
-    //   response = { status : "successed" };
-    //   res.end(JSON.stringify(response));
-    // });
+    
+    let options = {
+        filter: {
+            value: [],
+        },
+        fromBlock: 0
+    };
+    
+    revenueContract.events.WeaponMinted(options)
+        .on('data', event => {
+            if(event.returnValues.transactionId === '1')
+                console.log(event);
+        })
+        .on('changed', changed => console.log(changed))
+        .on('error', err => err)
+        .on('connected', str => {
+            // console.log("connected => subscription id: " + str);
+        })
+
+    // revenueContract.events.BYOPillMinted(options)
+    //     .on('data', event => console.log(event))
+    //     .on('changed', changed => console.log(changed))
+    //     .on('error', err => err)
+    //     .on('connected', str => console.log(str))
+    
+    // revenueContract.events.MysterItemMinted(options)
+    //     .on('data', event => console.log(event))
+    //     .on('changed', changed => console.log(changed))
+    //     .on('error', err => err)
+    //     .on('connected', str => console.log(str))
+
+    // pool.query('Select * from test')
+	// 	.then(testData => {
+	// 		console.log(testData);
+	// 		res.send(testData.rows);
+	// 	})
+
   })
   
 
