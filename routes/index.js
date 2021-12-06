@@ -6,14 +6,22 @@ router.use(cors());
 
 const Pool = require('pg').Pool;
 
-const pool = new Pool({
-	user: 'postgres',
-	host: 'localhost',
-	database: 'polygondb',
-	password: 'polygontest123',
+const pool = new Pool({         //PostgreSQL in Heroku
+	user: 'ajncgccueoathm',
+	host: 'ec2-18-210-159-154.compute-1.amazonaws.com',
+	database: 'd694d7up4h4bn4',
+	password: '7582e992374b4acec632c9d2828e36d518c039a2161d253f085295e5ea7c0cb3',
 	dialect: 'postgres',
 	port: 5432
 });
+// const pool = new Pool({
+// 	user: 'postgres',
+// 	host: 'localhost',
+// 	database: 'polygondb',
+// 	password: 'polygontest123',
+// 	dialect: 'postgres',
+// 	port: 5432
+// });
 
 pool.connect((err, client, release) => {
 	if (err) {
