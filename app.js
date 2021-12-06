@@ -14,6 +14,22 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+var allowCrossDomain = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+
+    // intercept OPTIONS method
+    if ('OPTIONS' == req.method) {
+      res.send(200);
+    }
+    else {
+      next();
+    }
+};
+app.use(allowCrossDomain);
+// app.use(cors());
+
 /* To handle the HTTP Methods Body Parser
 is used, Generally used to extract the
 entire body portion of an incoming
@@ -21,7 +37,7 @@ request stream and exposes it on req.body
 */
 const bodyParser = require('body-parser');
 app.use(bodyParser.json())
-app.use(cors());
+
 app.use(bodyParser.urlencoded({ extended: false }));
 
 const index = require("./routes/index");
