@@ -28,7 +28,7 @@ var allowCrossDomain = function(req, res, next) {
     }
 };
 app.use(allowCrossDomain);
-// app.use(cors());
+app.use(cors());
 
 /* To handle the HTTP Methods Body Parser
 is used, Generally used to extract the
