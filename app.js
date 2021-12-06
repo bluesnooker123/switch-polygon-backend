@@ -117,9 +117,7 @@ io.on('connection', (socket) => {
     }
 });
 
-
-server.listen(3333, function () {
-	let host = server.address().address
-	let port = server.address().port
-	console.log("Starting the Server at the port 3333");
+const port = process.env.PORT || 3333;
+server.listen(port, function () {
+	console.log(`express app running on port ${port}`);
 })
