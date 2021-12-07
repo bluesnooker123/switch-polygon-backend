@@ -123,7 +123,7 @@ io.on('connection', (socket) => {
     }
 });
 
-const port = process.env.PORT || 3333;
+const port = process.env.PORT || 80;
 server.listen(port, function () {
 	console.log(`express app running on port ${port}`);
 })
