@@ -12,7 +12,12 @@ function exported by the express module.
 const app = express();
 
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server,{
+    cors: {
+        origin: "*",    
+        methods: ["GET", "POST"]  
+    }
+});
 
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
@@ -44,6 +49,7 @@ const index = require("./routes/index");
 app.use(index);
 
 io.on('connection', (socket) => {
+    console.log("New client connected");
     try{
         socket.on('listenEvent', function (message) {
             console.log('socket.Id: ' + socket.id);
